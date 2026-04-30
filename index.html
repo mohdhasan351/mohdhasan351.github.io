@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aarvion — Android & Backend Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b10;
+    --surface: #0e1420;
+    --card: #111827;
+    --accent: #00e5ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --text: #e8edf5;
+    --muted: #6b7a96;
+    --border: rgba(0,229,255,0.12);
+    --glow: rgba(0,229,255,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ── HERO BG ORBS ── */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 500px; height: 500px; background: rgba(0,229,255,0.07); top: -100px; right: -100px; }
+  .orb-2 { width: 400px; height: 400px; background: rgba(124,58,237,0.08); bottom: 200px; left: -80px; animation-delay: -5s; }
+  .orb-3 { width: 300px; height: 300px; background: rgba(245,158,11,0.05); top: 50%; right: 20%; animation-delay: -9s; }
+
+  @keyframes drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 40px) scale(1.08); }
+  }
+
+  /* ── LAYOUT ── */
+  .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,11,16,0.7);
+    padding: 1.1rem 0;
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--text); }
+  nav ul { list-style: none; display: flex; gap: 2rem; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  nav a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero { padding: 7rem 0 5rem; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.5rem;
+    border: 1px solid var(--border); padding: 0.4rem 1rem; border-radius: 100px;
+    background: rgba(0,229,255,0.05);
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-eyebrow::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  .hero h1 .line2 { color: var(--accent); display: block; }
+  .hero h1 .line3 { color: var(--muted); display: block; font-size: 0.55em; font-weight: 600; letter-spacing: 0em; margin-top: 0.3em; }
+
+  .hero-desc {
+    max-width: 540px; line-height: 1.8;
+    color: var(--muted); font-size: 0.9rem;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.7s 0.3s ease both; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 1.8rem; border-radius: 8px;
+    font-family: 'DM Mono', monospace; font-size: 0.8rem;
+    font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase;
+    text-decoration: none; transition: all 0.25s; cursor: pointer; border: none;
+  }
+  .btn-primary {
+    background: var(--accent); color: #080b10;
+    box-shadow: 0 0 30px rgba(0,229,255,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,229,255,0.55); }
+  .btn-outline {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--glow); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem; flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.4s ease both;
+    padding-top: 2.5rem; border-top: 1px solid var(--border);
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+    color: var(--accent); line-height: 1;
+  }
+  .stat-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.3rem; }
+
+  /* ── SECTION HEADINGS ── */
+  .section { padding: 5rem 0; }
+  .section-tag {
+    font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.7rem;
+  }
+  .section-tag::after { content: ''; flex: 1; max-width: 60px; height: 1px; background: var(--accent); opacity: 0.4; }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800; letter-spacing: -0.02em; margin-bottom: 3rem;
+  }
+
+  /* ── FEATURED APP CARD ── */
+  .app-feature {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  .app-feature::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,229,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .app-feature:hover { border-color: rgba(0,229,255,0.35); box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(0,229,255,0.08); }
+
+  .app-icon-wrap {
+    width: 90px; height: 90px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; flex-shrink: 0;
+    box-shadow: 0 8px 30px rgba(0,229,255,0.25);
+  }
+  .app-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.3rem 0.8rem; border-radius: 100px;
+    background: rgba(245,158,11,0.12); color: var(--accent3); border: 1px solid rgba(245,158,11,0.25);
+    margin-bottom: 0.8rem;
+  }
+  .app-name {
+    font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 0.5rem;
+  }
+  .app-desc { color: var(--muted); font-size: 0.85rem; line-height: 1.7; max-width: 600px; margin-bottom: 1.5rem; }
+
+  .app-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .tag {
+    font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.3rem 0.8rem; border-radius: 6px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+  }
+
+  .app-metrics { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .metric { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--muted); }
+  .metric strong { color: var(--text); font-family: 'Syne', sans-serif; font-weight: 700; }
+  .metric .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent3); }
+  .metric .dot.green { background: #22c55e; }
+
+  /* ── SKILLS GRID ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .skill-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 1.8rem; transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .skill-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-local, var(--accent)), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .skill-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-3px); }
+  .skill-card:hover::after { opacity: 1; }
+  .skill-card-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+  .skill-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.6rem; }
+  .skill-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+  .skill-pill {
+    font-size: 0.67rem; letter-spacing: 0.05em; padding: 0.25rem 0.7rem;
+    border-radius: 100px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08); color: var(--muted);
+  }
+  .skill-pill.hot { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.2); color: var(--accent); }
+
+  /* ── EXP TIMELINE ── */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 2.5rem; }
+  .tl-dot {
+    position: absolute; left: -2.38rem; top: 0.3rem;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+    box-shadow: 0 0 10px rgba(0,229,255,0.5);
+  }
+  .tl-dot.purple { background: var(--accent2); box-shadow: 0 0 10px rgba(124,58,237,0.5); }
+  .tl-period { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .tl-role { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.15rem; }
+  .tl-company { font-size: 0.82rem; color: var(--accent); margin-bottom: 0.8rem; }
+  .tl-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.7; }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    text-align: center; padding: 5rem 0 7rem;
+    border-top: 1px solid var(--border);
+  }
+  .cta-section h2 {
+    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem;
+  }
+  .cta-section h2 span { color: var(--accent); }
+  .cta-section p { color: var(--muted); font-size: 0.9rem; margin-bottom: 2.5rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border); padding: 2rem 0;
+    color: var(--muted); font-size: 0.75rem;
+  }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--accent); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* ── PLAYSTORE BTN ── */
+  .playstore-btn {
+    display: inline-flex; align-items: center; gap: 0.8rem;
+    padding: 0.9rem 1.6rem; border-radius: 10px;
+    background: #1a2236; border: 1px solid var(--border);
+    color: var(--text); text-decoration: none;
+    font-family: 'DM Mono', monospace; font-size: 0.8rem;
+    transition: all 0.25s;
+  }
+  .playstore-btn:hover { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.06); transform: translateY(-2px); }
+  .ps-icon { font-size: 1.3rem; }
+  .ps-text small { display: block; font-size: 0.6rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .ps-text strong { display: block; font-size: 0.85rem; font-family: 'Syne', sans-serif; }
+
+  /* ── PROJECTS MINI ── */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 0; }
+  .project-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 1.8rem; transition: all 0.3s; position: relative;
+  }
+  .project-card:hover { border-color: rgba(0,229,255,0.25); transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+  .proj-num { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; opacity: 0.06; position: absolute; top: 1rem; right: 1.5rem; line-height: 1; }
+  .proj-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+  .proj-name { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 0.5rem; }
+  .proj-desc { color: var(--muted); font-size: 0.8rem; line-height: 1.7; margin-bottom: 1rem; }
+  .proj-tech { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+  @media (max-width: 640px) {
+    .app-feature { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+    .hero-stats { gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <a href="#" class="nav-logo">Aar<span>vion</span></a>
+    <ul>
+      <li><a href="#apps">Apps</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow">Available for freelance &amp; full-time</div>
+    <h1>
+      Building apps<br>
+      <span class="line2">that actually work.</span>
+      <span class="line3">Node.js Backend · Android Development · REST APIs</span>
+    </h1>
+    <p class="hero-desc">
+      Full-stack developer specializing in scalable Node.js backends and production-grade Android apps.
+      Published on Google Play · 3+ years building real products used by real people.
+    </p>
+    <div class="hero-ctas">
+      <a href="#apps" class="btn btn-primary">▶ &nbsp;See My Apps</a>
+      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">1K+</div>
+        <div class="stat-label">Play Store Downloads</div>
+      </div>
+      <div>
+        <div class="stat-num">4.8★</div>
+        <div class="stat-label">App Rating</div>
+      </div>
+      <div>
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div>
+        <div class="stat-num">5+</div>
+        <div class="stat-label">Shipped Projects</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FEATURED APP -->
+<section class="section" id="apps">
+  <div class="wrap">
+    <div class="section-tag">Featured Release</div>
+    <h2 class="section-title">Published on Google Play</h2>
+
+    <div class="app-feature">
+      <div class="app-icon-wrap">📷</div>
+      <div>
+        <div class="app-badge">⭐ 4.8 Rating · 1,000+ Downloads</div>
+        <div class="app-name">Photo &amp; Signature 20KB Resize</div>
+        <p class="app-desc">
+          The go-to tool for students filling competitive exam forms (UPSC, SSC, IBPS, SBI, JEE, NEET, and more).
+          Resize photos and signatures to exact KB limits with exam-ready presets — all processed locally on device, zero data uploaded.
+        </p>
+        <div class="app-tags">
+          <span class="tag">Android</span>
+          <span class="tag">Java</span>
+          <span class="tag">Firebase</span>
+          <span class="tag">Image Processing</span>
+          <span class="tag">UPSC · IBPS · JEE · NEET</span>
+        </div>
+        <div class="app-metrics" style="margin-bottom:1.5rem;">
+          <div class="metric"><span class="dot green"></span><strong>Active</strong> &nbsp;on Play Store</div>
+          <div class="metric"><span class="dot"></span><strong>Privacy-first</strong> &nbsp;— no data collected</div>
+          <div class="metric"><span class="dot"></span><strong>Updated</strong> &nbsp;Apr 2026</div>
+        </div>
+        <a href="https://play.google.com/store/apps/details?id=com.photoresizer.reduceinkb.examform" target="_blank" class="playstore-btn">
+          <span class="ps-icon">▶</span>
+          <span class="ps-text">
+            <small>Get it on</small>
+            <strong>Google Play</strong>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <!-- other projects -->
+    <h3 style="font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; margin:3.5rem 0 1.5rem; color: var(--muted); letter-spacing: 0.02em;">More Projects</h3>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="proj-num">01</div>
+        <div class="proj-icon">🎓</div>
+        <div class="proj-name">CHGC Student Portal</div>
+        <p class="proj-desc">Full-featured student portal for Chitravansham Group of Colleges. Profiles, marksheets, admit cards, fee details. Published on Play Store.</p>
+        <div class="proj-tech">
+          <span class="tag">Android</span><span class="tag">Firebase</span><span class="tag">Java</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="proj-num">02</div>
+        <div class="proj-icon">🤖</div>
+        <div class="proj-name">Cleario — YouTube Comment AI</div>
+        <p class="proj-desc">SaaS backend that helps YouTube creators detect bot &amp; spam comments with a 10-signal scoring engine. Reduces API consumption by ~80%.</p>
+        <div class="proj-tech">
+          <span class="tag">Node.js</span><span class="tag">MongoDB</span><span class="tag">YouTube API</span><span class="tag">OAuth 2.0</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="proj-num">03</div>
+        <div class="proj-icon">📱</div>
+        <div class="proj-name">Postaway II — Social Media API</div>
+        <p class="proj-desc">Complete social media REST backend — posts, comments, likes, friend requests, OTP-based password reset. JWT auth with bcrypt hashing.</p>
+        <div class="proj-tech">
+          <span class="tag">Express.js</span><span class="tag">JWT</span><span class="tag">Mongoose</span><span class="tag">Winston</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="proj-num">04</div>
+        <div class="proj-icon">💊</div>
+        <div class="proj-name">Medico</div>
+        <p class="proj-desc">Dual-app medicine ordering system. Customer app + admin app, Firebase-powered real-time updates, order placement flow.</p>
+        <div class="proj-tech">
+          <span class="tag">Android</span><span class="tag">Firebase</span><span class="tag">Java</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SKILLS -->
+<section class="section" id="skills">
+  <div class="wrap">
+    <div class="section-tag">Technical Stack</div>
+    <h2 class="section-title">Skills &amp; Technologies</h2>
+    <div class="skills-grid">
+
+      <div class="skill-card reveal" style="--accent-local: var(--accent)">
+        <div class="skill-card-icon">⚡</div>
+        <div class="skill-card-title">Backend Development</div>
+        <p style="color:var(--muted);font-size:0.8rem;line-height:1.6;">Async, event-driven APIs with production-level architecture.</p>
+        <div class="skill-list">
+          <span class="skill-pill hot">Node.js</span>
+          <span class="skill-pill hot">Express.js</span>
+          <span class="skill-pill hot">REST API</span>
+          <span class="skill-pill">JWT Auth</span>
+          <span class="skill-pill">Middleware</span>
+          <span class="skill-pill">Nodemailer</span>
+          <span class="skill-pill">Winston Logger</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal" style="--accent-local: #22c55e">
+        <div class="skill-card-icon">🗄️</div>
+        <div class="skill-card-title">Database</div>
+        <p style="color:var(--muted);font-size:0.8rem;line-height:1.6;">NoSQL schema design and optimized query patterns.</p>
+        <div class="skill-list">
+          <span class="skill-pill hot">MongoDB</span>
+          <span class="skill-pill hot">Mongoose ODM</span>
+          <span class="skill-pill">SQL</span>
+          <span class="skill-pill">Firebase</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal" style="--accent-local: var(--accent2)">
+        <div class="skill-card-icon">🤖</div>
+        <div class="skill-card-title">Android Development</div>
+        <p style="color:var(--muted);font-size:0.8rem;line-height:1.6;">End-to-end: design, build, test, and Play Store deployment.</p>
+        <div class="skill-list">
+          <span class="skill-pill hot">Android Studio</span>
+          <span class="skill-pill hot">Core Java</span>
+          <span class="skill-pill">MVVM</span>
+          <span class="skill-pill">Firebase</span>
+          <span class="skill-pill">MVC</span>
+          <span class="skill-pill">Broadcast Receiver</span>
+        </div>
+      </div>
+
+      <div class="skill-card reveal" style="--accent-local: var(--accent3)">
+        <div class="skill-card-icon">🛠️</div>
+        <div class="skill-card-title">Languages &amp; Tools</div>
+        <p style="color:var(--muted);font-size:0.8rem;line-height:1.6;">Comfortable across the full development lifecycle.</p>
+        <div class="skill-list">
+          <span class="skill-pill hot">JavaScript (ES6+)</span>
+          <span class="skill-pill">Core Java</span>
+          <span class="skill-pill">HTML</span>
+          <span class="skill-pill">CSS</span>
+          <span class="skill-pill">Git</span>
+          <span class="skill-pill">Postman</span>
+          <span class="skill-pill">VS Code</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- EXPERIENCE -->
+<section class="section" id="experience">
+  <div class="wrap">
+    <div class="section-tag">Work History</div>
+    <h2 class="section-title">Professional Experience</h2>
+
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <div class="tl-period">June 2024 — Present</div>
+        <div class="tl-role">Node.js Developer</div>
+        <div class="tl-company">Wipro · Pune, India</div>
+        <div class="tl-desc">
+          Designing and developing RESTful API components for enterprise backend services using Node.js and Express.js.
+          Implementing JWT-based auth, optimized MongoDB schemas, code reviews, cross-functional collaboration, and
+          independent maintenance of production modules.
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-dot purple"></div>
+        <div class="tl-period">Feb 2023 — June 2024</div>
+        <div class="tl-role">Android Developer</div>
+        <div class="tl-company">Webstockist · Allahabad, India</div>
+        <div class="tl-desc">
+          Solely responsible for end-to-end development and Play Store deployment of production mobile apps.
+          Built CHGC Student Portal (1,000+ downloads, 4.8★) and Medico dual-app system with Firebase integration.
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-dot" style="background: var(--muted); box-shadow: none;"></div>
+        <div class="tl-period">Aug 2018 — June 2022</div>
+        <div class="tl-role">B.Tech — Computer Science &amp; Engineering</div>
+        <div class="tl-company">United Institute of Technology · Allahabad</div>
+        <div class="tl-desc">CGPA: 6.9/10 · 15 years full-time education completed.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="wrap">
+    <div class="section-tag" style="justify-content:center">Let's Build Together</div>
+    <h2>Have a project<br><span>in mind?</span></h2>
+    <p>Open to freelance Android projects, backend contracts, and full-time opportunities.</p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+      <a href="mailto:mohdhasanuit@gmail.com" class="btn btn-primary">✉ &nbsp; Say Hello</a>
+      <a href="https://play.google.com/store/apps/developer?id=Aarvion" target="_blank" class="btn btn-outline">View on Play Store</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <span>© 2026 <strong style="color:var(--text)">Aarvion</strong> · All rights reserved.</span>
+    <div style="display:flex; gap:1.5rem;">
+      <a href="https://play.google.com/store/apps/developer?id=Aarvion" target="_blank">Play Store</a>
+      <a href="https://mohdhasan351.github.io/aarvion.github.io/" target="_blank">Privacy Policy</a>
+      <a href="mailto:mohdhasanuit@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
